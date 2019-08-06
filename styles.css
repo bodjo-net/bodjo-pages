@@ -1,0 +1,137 @@
+body, html, head {
+	margin: 0;
+	padding: 0;
+	font-family: 'Roboto';
+	background: #FAFAFA;
+}
+#bar, #main {
+	display: block;
+	margin: 10px auto;
+	width: 80%;
+}
+#bar {
+	font-family: 'Source Code Pro', 'Roboto Mono', Consolas, monospace;
+}
+#bar > * {
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 5px;
+}
+#bar > a {
+	text-decoration: none;
+	color: #000000;
+	border-bottom: 1px dotted #000000;
+}
+#bar > a:hover {
+	border-bottom: 1px dashed #000000;
+}
+#bar > a:active {
+	font-weight: bold;
+}
+#title h3 {
+	margin: 0;
+	margin-right: 5px;
+}
+#bar #auth {
+	float: right;
+}
+#bar #auth input {
+	transition: all 0.5s ease-in-out;
+	display: inline-block;
+	max-width: 150px;
+}
+#bar #auth.verified input {
+	color: #1B5E20;
+	border-color: #43A047;
+	border-width: 2px;
+}
+
+input {
+	width: 100%;
+	border: none;
+	background: transparent;
+	font-family: 'Source Code Pro', 'Roboto Mono', Consolas, monospace;
+	font-size: 15px;
+	border-bottom: 1px solid rgba(0,0,0,0.1);
+	padding: 5px 10px;
+	box-sizing: border-box;
+	outline: none;
+}
+#editor #box {
+	width: 100%;
+	min-height: 500px;
+	margin-top: 10px;
+	background: #FFFFFF;
+	border-radius: 2px;
+	overflow: hidden;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+	position: relative;
+}
+#editor #box #workspace {
+	width: 50%;
+	box-sizing: border-box;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	float: left;
+	border-right: 1px solid rgba(0,0,0,0.1);
+}
+#editor #box #workspace textarea {
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	border: none;
+	resize: none;
+	outline: none;
+	font-family: 'Source Code Pro', 'Roboto Mono', Consolas, monospace;
+	font-weight: 300;
+	padding: 10px;
+	-webkit-tab-size: 4;
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+}
+#editor #box #preview {
+	width: 50%;
+	box-sizing: border-box;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	padding: 10px;
+	float: right;
+	overflow-y: auto;
+}
+.btn {
+	display: inline-block;
+	padding: 8px 15px;
+	margin: 15px 0;
+	background: #ffffff;
+	user-select: none;
+	border-radius: 2px;
+	-ms-user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	cursor: pointer;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.btn .ripple {
+	background: rgba(0,0,0,0.1);
+}
+#editor #count {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    opacity: 0.5;
+    padding: 5px;
+    font-family: 'Source Code Pro', 'Roboto Mono', Consolas, monospace;
+}
+#editor .btn#remove {
+	color: #ffffff;
+	background: #F44336;
+	margin-left: 10px;
+}
+#editor .btn#remove .ripple {
+	background: rgba(255,255,255,0.4);
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" type="image/png" href="favicon.png">
+	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+	<title>bodjo/pages</title>
+	<link rel="stylesheet" type="text/css" href="/styles.css">
+	<link rel="stylesheet" type="text/css" href="/page.css">
+	<link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:100,300,400,700|Source+Code+Pro:400,700&display=swap&subset=cyrillic" rel="stylesheet">
+</head>
+<body>
+	<div id="bar">
+		<div id="title">
+			<h3>bodjo-pages</h3>
+		</div>
+		<div id="auth">
+			<input type="text" placeholder="username" id="username">
+			<input type="password" placeholder="password" id="password">
+		</div>
+	</div>
+	<div id="main">
+		<div id="editor">
+			<input placeholder="id" id='page-id'>
+			<div id="box">
+				<div id="workspace">
+					<textarea placeholder="Start typing..."></textarea>
+					<div id="count"></div>
+				</div>
+				<div id="preview" class="bodjo-page"></div>
+			</div>
+			<div class='btn' id="submit">PUBLISH</div>
+			<div class='btn' id="remove">REMOVE</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/btn.js"></script>
+	<script type="text/javascript" src="/editor.js"></script>
+</body>
+</html>
