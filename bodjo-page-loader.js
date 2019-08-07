@@ -67,8 +67,16 @@
 	}
 	function datestr(timestamp) {
 		let date = new Date(timestamp);
-		return date.toDateString().split(' ').slice(1).join(' ') + ', ' + date.getHours() + ':' + date.getMinutes();
-
+		return date.toDateString().split(' ').slice(1).join(' ') + ', ' + addZeros(date.getHours()) + ':' + addZeros(date.getMinutes());
+	}
+	function addZeros(str, n) {
+		if (typeof str !== 'string')
+			str = str.toString();
+		if (typeof n !== 'number')
+			n = 2;
+		if (str.length >= n)
+			return str;
+		return "0".repeat(n - str.length) + str;
 	}
 	function parse(string) {
 		string = string.replace(/\</g, '&lt;');
