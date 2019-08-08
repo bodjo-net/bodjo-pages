@@ -1,8 +1,8 @@
-let SERVER_IP = null;
-GET('https://bodjo.net/SERVER_IP', (status, data) => {
+let SERVER_HOST = null;
+GET('https://bodjo.net/SERVER_HOST', (status, data) => {
 	if (status) {
-		SERVER_IP = data;
-		console.log("Got main server IP: " + SERVER_IP);
+		SERVER_HOST = data;
+		console.log("Got main server IP: " + SERVER_HOST);
 
 		onload();
 	}
@@ -42,7 +42,7 @@ passwordInput.addEventListener('change', credentialsChange);
 function credentialsChange() {
 	let usernameValue = usernameInput.value;
 	let passwordValue = /^\*+$/g.test(passwordInput.value) ? JSON.parse(localStorage['bodjo-password']) : passwordInput.value;
-	GET(SERVER_IP + '/account/login?username=' + usernameValue + '&password=' + encodeURIComponent(passwordValue), (status, data) => {
+	GET(SERVER_HOST + '/account/login?username=' + usernameValue + '&password=' + encodeURIComponent(passwordValue), (status, data) => {
 		if (usernameValue != usernameInput.value ||
 			(!/^\*+$/g.test(passwordInput.value) && passwordValue != passwordInput.value)) {
 			auth.className = '';
@@ -160,7 +160,7 @@ function onPageIDChange() {
 	let pageId = idInput.value;
 	exists = false;
 	updateSubmitButton();
-	GET(SERVER_IP + '/pages/load?id=' + pageId, (status, data) => {
+	GET(SERVER_HOST + '/pages/load?id=' + pageId, (status, data) => {
 		if (status && data.status == 'ok') {
 			if (data.page.id != pageId) {
 				exists = false;
@@ -248,7 +248,7 @@ function upload() {
 		return;
 	}
 
-	POST(SERVER_IP + "/pages/" + (exists ? 'edit' : 'publish') + "?id=" + idInput.value + "&token=" + tokenData.value, (req) => {
+	POST(SERVER_HOST + "/pages/" + (exists ? 'edit' : 'publish') + "?id=" + idInput.value + "&token=" + tokenData.value, (req) => {
 		req.setRequestHeader('Content-Type', 'plain/text');
 		req.send(textarea.value);
 	}, (status, data) => {
@@ -276,7 +276,7 @@ function removePage() {
 		return;
 	}
 
-	GET(SERVER_IP + "/pages/remove?id=" + idInput.value + "&token=" + tokenData.value,
+	GET(SERVER_HOST + "/pages/remove?id=" + idInput.value + "&token=" + tokenData.value,
 		(status, data) => {
 		if (status && data.status == 'ok') {
 			alert('success');
