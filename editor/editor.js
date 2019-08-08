@@ -6,7 +6,32 @@ GET('https://bodjo.net/SERVER_IP', (status, data) => {
 
 		onload();
 	}
-})
+});
+
+// cookies (thanks to https://learn.javascript.ru/cookie)
+function getCookie(name) {
+  let matches = document.cookie.match(new RegExp(
+    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+  ));
+  return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+function setCookie(name, value, options) {
+  options = {
+    path: '/',
+    ...options
+  }
+
+  let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+
+  for (let optionKey in options) {
+    updatedCookie += "; " + optionKey;
+    let optionValue = options[optionKey];
+    if (optionValue !== true)
+      updatedCookie += "=" + optionValue;
+  }
+
+  document.cookie = updatedCookie;
+}
 
 let tokenData = null;
 let auth = document.querySelector('#auth');
@@ -16,7 +41,7 @@ usernameInput.addEventListener('change', credentialsChange);
 passwordInput.addEventListener('change', credentialsChange);
 function credentialsChange() {
 	let usernameValue = usernameInput.value;
-	let passwordValue = /^\*+$/g.test(passwordInput.value) ? localStorage['bodjo-password'] : passwordInput.value;
+	let passwordValue = /^\*+$/g.test(passwordInput.value) ? JSON.parse(localStorage['bodjo-password']) : passwordInput.value;
 	GET(SERVER_IP + '/account/login?username=' + usernameValue + '&password=' + encodeURIComponent(passwordValue), (status, data) => {
 		if (usernameValue != usernameInput.value ||
 			(!/^\*+$/g.test(passwordInput.value) && passwordValue != passwordInput.value)) {
@@ -25,18 +50,20 @@ function credentialsChange() {
 		}
 		if (status && data.status == 'ok') {
 			tokenData = data.token;
+			localStorage.setItem('bodjo-token', JSON.stringify(tokenData.value));
+			setCookie('bodjo-token', JSON.stringify(tokenData.value), {domain: 'bodjo.net'});
 			auth.className = 'verified';
 		} else {
 			auth.className = '';
 		}
 
-		localStorage.setItem('bodjo-username', usernameValue);
-		localStorage.setItem('bodjo-password', passwordValue);
+		localStorage.setItem('bodjo-username', JSON.stringify(usernameValue));
+		localStorage.setItem('bodjo-password', JSON.stringify(passwordValue));
 	})
 }
 function onload() {
 	if (localStorage['bodjo-username'])
-		usernameInput.value = localStorage['bodjo-username'];
+		usernameInput.value = JSON.parse(localStorage['bodjo-username']);
 	if (localStorage['bodjo-password'])
 		passwordInput.value = '*'.repeat(100);
 	credentialsChange();
