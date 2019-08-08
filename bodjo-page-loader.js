@@ -7,7 +7,7 @@
 (function () {
 
 	const prefix = 'bodjo-page-loader';
-	let SERVER_IP = null;
+	let SERVER_HOST = null;
 	let stylesheet = null;
 
 	window.loadBodjoPage = function (id, element) {
@@ -17,12 +17,12 @@
 		if (stylesheet == null)
 			applyStylesheet();
 
-		if (SERVER_IP == null)
+		if (SERVER_HOST == null)
 			getServerIP(load);
 		else load();
 
 		function load() {
-			GET(SERVER_IP + "/pages/load?id=" + id, (status, data) => {
+			GET(SERVER_HOST + "/pages/load?id=" + id, (status, data) => {
 				if (status) {
 					if (data.status != 'ok') {
 						console.warn(prefix, 'bad api response', data);
@@ -39,7 +39,7 @@
 	}
 	function signature (page) {
 		let id = 'u' + Math.round(Math.random() * 9999999);
-		GET(SERVER_IP+'/account/info?username='+page.author, (status, data) => {
+		GET(SERVER_HOST+'/account/info?username='+page.author, (status, data) => {
 			let author = document.querySelector('#'+id);
 			if (status && data.status == 'ok') {
 				let userInfo = data.result[0];
@@ -132,9 +132,9 @@
 	}
 
 	function getServerIP(cb) {
-		GET('https://bodjo.net/SERVER_IP', (status, data) => {
+		GET('https://bodjo.net/SERVER_HOST', (status, data) => {
 			if (status) {
-				SERVER_IP = data;
+				SERVER_HOST = data;
 				cb();
 			} else {
 				console.warn(prefix, 'failed to get server ip, bad http response: ' + data.statusCode + ': ' + data.statusText);
