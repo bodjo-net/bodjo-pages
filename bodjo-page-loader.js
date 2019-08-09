@@ -10,7 +10,9 @@
 	let SERVER_HOST = null;
 	let stylesheet = null;
 
-	window.loadBodjoPage = function (id, element) {
+	window.loadBodjoPage = function (id, element, addSignature) {
+		if (typeof addSignature === 'undefined')
+			addSignature = true;
 		if (typeof element === 'string')
 			element = document.querySelector(element);
 
@@ -29,7 +31,7 @@
 					} else {
 						if (element.className.indexOf('bodjo-page') < 0)
 							element.className += ' bodjo-page';
-						element.innerHTML = signature(data.page) + parse(data.page.content);
+						element.innerHTML = (addSignature ? signature(data.page) : '') + parse(data.page.content);
 					}
 				} else {
 					console.warn(prefix, 'bad http response: ' + data.statusCode + ": " + data.statusText);
