@@ -20,24 +20,31 @@
 		if (stylesheet == null)
 			applyStylesheet();
 
-		if (SERVER_HOST == null)
-			getServerIP(load);
-		else load();
+		if (options.raw) {
+			put(id)
+		} else {
+			if (SERVER_HOST == null)
+				getServerIP(load);
+			else load();
+		}
 
 		function load() {
-			GET(SERVER_HOST + "/pages/load?id=" + id, (status, data) => {
+			GET(SERVER_HOST + "/pages/load?id=" + id + (options.preview ? '&preview' : ''), (status, data) => {
 				if (status) {
 					if (data.status != 'ok') {
 						console.warn(prefix, 'bad api response', data);
 					} else {
-						if (element.className.indexOf('bodjo-page') < 0)
-							element.className += ' bodjo-page';
-						element.innerHTML = signature(data.page, options.signature, options.cache) + parse(data.page.content);
+						put(data);
 					}
 				} else {
 					console.warn(prefix, 'bad http response: ' + data.statusCode + ": " + data.statusText);
 				}
 			}, options.cache);
+		}
+		function put(data) {
+			if (element.className.indexOf('bodjo-page') < 0)
+				element.className += ' bodjo-page';
+			element.innerHTML = (typeof data.page === 'undefined' ? '' : signature(data.page, options.signature, options.cache)) + parse(typeof data.page === 'undefined' ? data : data.page.content);
 		}
 	}
 	function signature (page, moreInfo, ignoreCache) {
@@ -93,6 +100,7 @@
 	function parse(string) {
 		string = string.replace(/\</g, '&lt;');
 		string = string.replace(/\>/g, '&gt;');
+		string = string.replace(/^\~{5}(?:\n|\r\n){0,1}/gm, ''); // removing preview mark
 
 		string = string.replace(/\`\`\`(?:\n|\r\n){0,1}((\n|[^`])+)\`\`\`/gm, function (full, content) {
 			return ("<pre class='code'>" + 
@@ -131,6 +139,8 @@
 			})+"</ul>";
 		});
 
+		string = string.replace(/v\(([^\)]+)\)/g, "<video src='$1' muted loop autoplay></video>");
+		string = string.replace(/V\(([^\)]+)\)/g, "<video src='$1' controls></video>");
 		string = string.replace(/\!\[([^\]]*)\]\(([^\)]+)\)/g, "<img src='$2' alt='$1'></img>");
 		string = string.replace(/(?:\n|\r\n){0,1}\&gt\;\[([^\]]*)\]\(([^\)]+)\)(?:\n|\r\n){0,1}/g, "<img src='$2' class='right' alt='$1'></img>");
 		string = string.replace(/(?:\n|\r\n){0,1}\&lt\;\[([^\]]*)\]\(([^\)]+)\)(?:\n|\r\n){0,1}/g, "<img src='$2' class='left' alt='$1'></img>");
@@ -156,7 +166,7 @@
 
 	function applyStylesheet() {
 		stylesheet = document.createElement('style');
-		stylesheet.innerHTML = '@import url(https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Source+Code+Pro:400,700&display=swap&subset=cyrillic);.bodjo-page{font-size:100%;font-family:"Source Code Pro","Roboto Mono",Consolas,monospace}.bodjo-page h1,.bodjo-page h2,.bodjo-page h3,.bodjo-page h4,.bodjo-page h5,.bodjo-page h6,.bodjo-page p{margin:0;display:inline-block}.bodjo-page pre.code{background:rgba(0,0,0,.05);border-radius:2px;padding:5px;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:inline-block;font-size:130%;max-width:100%;box-sizing:border-box;overflow:hidden;word-break:break-all;white-space:normal}.bodjo-page span.code-small{background:rgba(0,0,0,.05);border-radius:2px;padding:2px;display:inline-block;font-size:90%}.bodjo-page div.question,.bodjo-page div.warning{box-sizing:border-box;display:inline-block;min-width:50%;position:relative;border-radius:2px;padding:5px;padding-right:25px}.bodjo-page div.question>span:nth-child(1),.bodjo-page div.warning>span:nth-child(1){position:absolute;top:0;right:0;width:27px;text-align:center;font-weight:700;font-size:150%}.bodjo-page div.warning{background-color:rgba(255,204,128,.5)}.bodjo-page div.warning>span:nth-child(1){color:rgba(127,102,64,1)}.bodjo-page div.question{background-color:rgba(144,202,249,.5)}.bodjo-page div.question>span:nth-child(1){color:rgba(72,101,123,1)}.bodjo-page img.right{margin:10px 0 10px 10px;float:right;max-width:50%}.bodjo-page img.left{margin:10px 10px 10px 0;float:left;max-width:50%}.bodjo-page img{max-width:100%}.bodjo-page ul{margin:0 0 0 5px}.bodjo-page .signature{font-size:110%;margin-bottom:10px}.bodjo-page .signature .id{display:inline-block;text-decoration:none;border-bottom:1px dashed rgba(0,0,0,0.15);color:rgba(0,0,0,0.5);font-size:75%}.bodjo-page .signature .id:hover{border-bottom:1px dotted rgba(0,0,0,0.5)}.bodjo-page .signature .id:active{font-weight:bold;color:#000;border-bottom:1px solid #000;}.bodjo-page .signature .date{font-style:italic;font-size:60%}.bodjo-page .signature .info{float:right;text-align:right;margin:5px 0}.bodjo-page .signature .author{min-width:100px;display:inline-block;padding:5px 0}.bodjo-page .signature .author span.image{width:25px;height:25px;display:inline-block;background-size:contain;box-shadow:0 1px 3px rgba(0,0,0,.2);border-radius:50%;margin-right:8px}.bodjo-page .signature .author>*{vertical-align:bottom;display:inline-block;line-height:50%}.bodjo-page .signature .author .name .username{margin:0}.bodjo-page .signature .author .name .role{opacity:.5;font-size:60%;margin:0}.bodjo-page .signature .author.loading span.image{background-color:rgba(0,0,0,.1);animation:loadingblink infinite ease-in-out 1s}@keyframes loadingblink{0%{background:rgba(0,0,0,.025)}50%{background:rgba(0,0,0,.075)}100%{background:rgba(0,0,0,.025)}}';
+		stylesheet.innerHTML = '@import url(https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Source+Code+Pro:400,700&display=swap&subset=cyrillic);.bodjo-page{font-size:100%;font-family:"Source Code Pro","Roboto Mono",Consolas,monospace}.bodjo-page h1,.bodjo-page h2,.bodjo-page h3,.bodjo-page h4,.bodjo-page h5,.bodjo-page h6,.bodjo-page p{margin:0;display:inline-block}.bodjo-page pre.code{background:rgba(0,0,0,.05);border-radius:2px;padding:5px;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:inline-block;font-size:130%;max-width:100%;box-sizing:border-box;overflow:hidden;word-break:break-all;white-space:normal}.bodjo-page span.code-small{background:rgba(0,0,0,.05);border-radius:2px;padding:2px;display:inline-block;font-size:90%}.bodjo-page div.question,.bodjo-page div.warning{box-sizing:border-box;display:inline-block;min-width:50%;position:relative;border-radius:2px;padding:5px;padding-right:25px}.bodjo-page div.question>span:nth-child(1),.bodjo-page div.warning>span:nth-child(1){position:absolute;top:0;right:0;width:27px;text-align:center;font-weight:700;font-size:150%}.bodjo-page div.warning{background-color:rgba(255,204,128,.5)}.bodjo-page div.warning>span:nth-child(1){color:rgba(127,102,64,1)}.bodjo-page div.question{background-color:rgba(144,202,249,.5)}.bodjo-page div.question>span:nth-child(1){color:rgba(72,101,123,1)}.bodjo-page img.right{margin:10px 0 10px 10px;float:right;max-width:50%}.bodjo-page img.left{margin:10px 10px 10px 0;float:left;max-width:50%}.bodjo-page img{max-width:100%}.bodjo-page ul{margin:0 0 0 5px}.bodjo-page .signature{font-size:110%;margin-bottom:2px}.bodjo-page .signature .id{display:inline-block;text-decoration:none;border-bottom:1px dashed rgba(0,0,0,0.15);color:rgba(0,0,0,0.5);font-size:75%}.bodjo-page .signature .id:hover{border-bottom:1px dotted rgba(0,0,0,0.5)}.bodjo-page .signature .id:active{font-weight:bold;color:#000;border-bottom:1px solid #000;}.bodjo-page .signature .date{font-style:italic;font-size:60%}.bodjo-page .signature .info{float:right;text-align:right;margin:5px 0}.bodjo-page .signature .author{min-width:100px;display:inline-block;padding:5px 0}.bodjo-page .signature .author span.image{width:25px;height:25px;display:inline-block;background-size:contain;box-shadow:0 1px 3px rgba(0,0,0,.2);border-radius:50%;margin-right:8px}.bodjo-page .signature .author>*{vertical-align:bottom;display:inline-block;line-height:50%}.bodjo-page .signature .author .name .username{margin:0}.bodjo-page .signature .author .name .role{opacity:.5;font-size:60%;margin:0}.bodjo-page .signature .author.loading span.image{background-color:rgba(0,0,0,.1);animation:loadingblink infinite ease-in-out 1s}@keyframes loadingblink{0%{background:rgba(0,0,0,.025)}50%{background:rgba(0,0,0,.075)}100%{background:rgba(0,0,0,.025)}}.bodjo-page video{max-width: 100%}';
 		document.querySelector('head').appendChild(stylesheet);
 	}
 	let cache = {};

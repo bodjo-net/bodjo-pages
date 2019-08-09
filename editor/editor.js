@@ -130,7 +130,7 @@ let remove = document.querySelector("#editor #remove");
 textarea.addEventListener('change', onChange);
 textarea.addEventListener('keyup', onChange);
 function onChange() {
-	preview.innerHTML = parse(textarea.value);
+	loadBodjoPage(textarea.value, preview, {raw: true});
 	count.innerText = textarea.value.length;
 	count.style.paddingRight = (textarea.scrollHeight > textarea.clientHeight ? "25px" : "5px")
 }
@@ -189,58 +189,6 @@ window.addEventListener('keydown', function (e) {
 });
 textarea.style.fontSize = fontSize + 'px';
 
-function parse(string) {
-	string = string.replace(/\</g, '&lt;');
-	string = string.replace(/\>/g, '&gt;');
-
-	string = string.replace(/\`\`\`(?:\n|\r\n){0,1}((\n|[^`])+)\`\`\`/gm, function (full, content) {
-		return ("<pre class='code'>" + 
-			content.replace(/\#/g, '&#35;')
-				.replace(/\!/g, '&#33;')
-				.replace(/\?/g, '&#63;')
-				.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
-				.replace(/ /g, '&nbsp;')
-		 + "</pre>");
-	});
-	string = string.replace(/\`([^`]+)\`/g, "<span class='code-small'>$1</span>");
-
-	string = string.replace(/^(\#{1,6}) (.+)$/gm, function (full, hashtags, content) {
-		return '<h' + hashtags.length + '>'+content+'</h'+hashtags.length+'>';
-	});
-
-	string = string.replace(/^(\?|\!) {0,1}\{(?:\n|\r\n){0,1}([^\}]+)(?:\n|\r\n){0,1}\}/gm, function (full, sign, content) {
-		return '<div class="'+({'?':'question','!':'warning'})[sign]+'"><span>'+sign+'</span>'+content+'</div>';
-	});
-
-	string = string.replace(/((?:^(?:[ \t]*)(?:\-|\d+\.|\w+\.) (?:[^\n\r]+)\n{0,1}){1,})/gm, function (full) {
-		return "<ul>" + full.replace(/^([ \t]*)(\-|\d+\.|\w+\.) (.+)(?:\n|\r\n){0,1}/gm, function (full, tabs, marker, content) {
-			let style = "", t = (tabs.match(/\t/g)||[]).length;
-			if (/^[ixv]+\.$/.test(marker)) {
-				style = "list-style: lower-roman;";
-			} else if (/^[IXV]+\.$/.test(marker)) {
-				style = "list-style: upper-roman;";
-			} else if (/^\d+\.$/.test(marker) || /^\w+\.$/.test(marker)) {
-				style = 'list-style: none;';
-				content = marker + " " + content;
-			} else if (t >= 0)
-				style = "list-style: "+(['disc','circle','square'])[t%3]+';';
-			if (t > 0)
-				style += "margin-left: " + t + "em;";
-			return "<li style='"+style+"'>"+content+"</li>";
-		})+"</ul>";
-	});
-
-	string = string.replace(/\!\[([^\]]*)\]\(([^\)]+)\)/g, "<img src='$2' alt='$1'></img>");
-	string = string.replace(/(?:\n|\r\n){0,1}\&gt\;\[([^\]]*)\]\(([^\)]+)\)(?:\n|\r\n){0,1}/g, "<img src='$2' class='right' alt='$1'></img>");
-	string = string.replace(/(?:\n|\r\n){0,1}\&lt\;\[([^\]]*)\]\(([^\)]+)\)(?:\n|\r\n){0,1}/g, "<img src='$2' class='left' alt='$1'></img>");
-	string = string.replace(/\[([^\]]*)\]\(([^\)]+)\)/g, "<a href='$2'>$1</a>");
-
-	string = string.replace(/__([^_]+)__/g, "<i>$1</i>");
-	string = string.replace(/\*\*([^\*]+)\*\*/g, "<b>$1</b>");
-
-	string = string.replace(/(?:\n|\r\n)/g, '<br>');
-	return string;
-}
 
 function upload() {
 	if (tokenData == null) {
