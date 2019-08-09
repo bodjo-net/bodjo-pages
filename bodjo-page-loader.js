@@ -44,7 +44,7 @@
 		function put(data) {
 			if (element.className.indexOf('bodjo-page') < 0)
 				element.className += ' bodjo-page';
-			element.innerHTML = (typeof data.page === 'undefined' ? '' : signature(data.page, options.signature, options.cache)) + parse(typeof data.page === 'undefined' ? data : data.page.content);
+			element.innerHTML = (typeof data.page === 'undefined' ? '' : signature(data.page, options.signature, options.cache)) + parseBodjoPage(typeof data.page === 'undefined' ? data : data.page.content);
 		}
 	}
 	function signature (page, moreInfo, ignoreCache) {
@@ -97,7 +97,7 @@
 			return str;
 		return "0".repeat(n - str.length) + str;
 	}
-	function parse(string) {
+	window.parseBodjoPage = function(string) {
 		string = string.replace(/\</g, '&lt;');
 		string = string.replace(/\>/g, '&gt;');
 		string = string.replace(/^\~{5}(?:\n|\r\n){0,1}/gm, ''); // removing preview mark
