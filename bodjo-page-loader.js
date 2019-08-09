@@ -13,7 +13,7 @@
 		if (typeof options.signature === 'undefined')
 			options.signature = true;
 		if (typeof options.cache === 'undefined')
-			options.cache = false;
+			options.cache = true;
 		if (typeof element === 'string')
 			element = document.querySelector(element);
 
@@ -160,10 +160,10 @@
 		document.querySelector('head').appendChild(stylesheet);
 	}
 	let cache = {};
-	function GET(url, callback, ignoreCache) {
+	function GET(url, callback, useCache) {
 		if (url.indexOf('http://')!=0&&url.indexOf('https://')!=0)
 			url = 'http://'+url;
-		if (cache[url] && !ignoreCache) {
+		if (cache[url] && useCache) {
 			callback.apply(null, cache[url]);
 			return;
 		}
