@@ -31,7 +31,7 @@
 					} else {
 						if (element.className.indexOf('bodjo-page') < 0)
 							element.className += ' bodjo-page';
-						element.innerHTML = (addSignature ? signature(data.page) : '') + parse(data.page.content);
+						element.innerHTML = signature(data.page, addSignature) + parse(data.page.content);
 					}
 				} else {
 					console.warn(prefix, 'bad http response: ' + data.statusCode + ": " + data.statusText);
@@ -39,18 +39,22 @@
 			})
 		}
 	}
-	function signature (page) {
-		let id = 'u' + Math.round(Math.random() * 9999999);
-		GET(SERVER_HOST+'/account/info?username='+page.author, (status, data) => {
-			let author = document.querySelector('#'+id);
-			if (status && data.status == 'ok') {
-				let userInfo = data.result[0];
-				author.querySelector('.image').style.backgroundImage = 'url("'+userInfo.image["64"]+'")';
-			}
-			author.className = 'author';
-		});
+	function signature (page, moreInfo) {
+		let id;
+		if (moreInfo) {
+			id = 'u' + Math.round(Math.random() * 9999999);
+			GET(SERVER_HOST+'/account/info?username='+page.author, (status, data) => {
+				let author = document.querySelector('#'+id);
+				if (status && data.status == 'ok') {
+					let userInfo = data.result[0];
+					author.querySelector('.image').style.backgroundImage = 'url("'+userInfo.image["64"]+'")';
+				}
+				author.className = 'author';
+			});
+		}
 		return ('<div class="signature">'+ 
-					'<div class="id">' + page.id + '</div>' +
+					'<a class="id" href="https://pages.bodjo.net/#'+page.id+'">' + page.id + '</a><br>' +
+					(moreInfo ? (
 					'<div class="author loading" id="'+id+'">'+
 						'<span class="image"></span>' +
 						'<span class="name">'+
@@ -63,7 +67,8 @@
 						(page['date-edited'] > 0 ? 
 							'<div class="date edited">edited ' + datestr(page['date-edited']) + '</div>' : ''
 						) +
-					'</div>'+
+					'</div>'
+					) : '')+
 				'</div>'
 				);
 	}
@@ -146,7 +151,7 @@
 
 	function applyStylesheet() {
 		stylesheet = document.createElement('style');
-		stylesheet.innerHTML = '@import url(https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Source+Code+Pro:400,700&display=swap&subset=cyrillic);.bodjo-page{font-size:100%;font-family:"Source Code Pro","Roboto Mono",Consolas,monospace}.bodjo-page h1,.bodjo-page h2,.bodjo-page h3,.bodjo-page h4,.bodjo-page h5,.bodjo-page h6,.bodjo-page p{margin:0;display:inline-block}.bodjo-page pre.code{background:rgba(0,0,0,.05);border-radius:2px;padding:5px;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:inline-block;font-size:130%;max-width:100%;box-sizing:border-box;overflow:hidden;word-break:break-all;white-space:normal}.bodjo-page span.code-small{background:rgba(0,0,0,.05);border-radius:2px;padding:2px;display:inline-block;font-size:90%}.bodjo-page div.question,.bodjo-page div.warning{box-sizing:border-box;display:inline-block;min-width:50%;position:relative;border-radius:2px;padding:5px;padding-right:25px}.bodjo-page div.question>span:nth-child(1),.bodjo-page div.warning>span:nth-child(1){position:absolute;top:0;right:0;width:27px;text-align:center;font-weight:700;font-size:150%}.bodjo-page div.warning{background-color:rgba(255,204,128,.5)}.bodjo-page div.warning>span:nth-child(1){color:rgba(127,102,64,1)}.bodjo-page div.question{background-color:rgba(144,202,249,.5)}.bodjo-page div.question>span:nth-child(1){color:rgba(72,101,123,1)}.bodjo-page img.right{margin:10px 0 10px 10px;float:right;max-width:50%}.bodjo-page img.left{margin:10px 10px 10px 0;float:left;max-width:50%}.bodjo-page img{max-width:100%}.bodjo-page ul{margin:0 0 0 5px}.bodjo-page .signature{font-size:120%;margin-bottom:10px}.bodjo-page .signature .id{opacity:.5;font-size:75%}.bodjo-page .signature .date{font-style:italic;font-size:60%}.bodjo-page .signature .info{float:right;text-align:right;margin:5px 0}.bodjo-page .signature .author{min-width:100px;display:inline-block;padding:5px 0}.bodjo-page .signature .author span.image{width:25px;height:25px;display:inline-block;background-size:contain;box-shadow:0 1px 3px rgba(0,0,0,.2);border-radius:50%;margin-right:8px}.bodjo-page .signature .author>*{vertical-align:bottom;display:inline-block;line-height:50%}.bodjo-page .signature .author .name .username{margin:0}.bodjo-page .signature .author .name .role{opacity:.5;font-size:60%;margin:0}.bodjo-page .signature .author.loading span.image{background-color:rgba(0,0,0,.1);animation:loadingblink infinite ease-in-out 1s}@keyframes loadingblink{0%{background:rgba(0,0,0,.025)}50%{background:rgba(0,0,0,.075)}100%{background:rgba(0,0,0,.025)}}';
+		stylesheet.innerHTML = '@import url(https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Source+Code+Pro:400,700&display=swap&subset=cyrillic);.bodjo-page{font-size:100%;font-family:"Source Code Pro","Roboto Mono",Consolas,monospace}.bodjo-page h1,.bodjo-page h2,.bodjo-page h3,.bodjo-page h4,.bodjo-page h5,.bodjo-page h6,.bodjo-page p{margin:0;display:inline-block}.bodjo-page pre.code{background:rgba(0,0,0,.05);border-radius:2px;padding:5px;-moz-tab-size:4;-o-tab-size:4;tab-size:4;display:inline-block;font-size:130%;max-width:100%;box-sizing:border-box;overflow:hidden;word-break:break-all;white-space:normal}.bodjo-page span.code-small{background:rgba(0,0,0,.05);border-radius:2px;padding:2px;display:inline-block;font-size:90%}.bodjo-page div.question,.bodjo-page div.warning{box-sizing:border-box;display:inline-block;min-width:50%;position:relative;border-radius:2px;padding:5px;padding-right:25px}.bodjo-page div.question>span:nth-child(1),.bodjo-page div.warning>span:nth-child(1){position:absolute;top:0;right:0;width:27px;text-align:center;font-weight:700;font-size:150%}.bodjo-page div.warning{background-color:rgba(255,204,128,.5)}.bodjo-page div.warning>span:nth-child(1){color:rgba(127,102,64,1)}.bodjo-page div.question{background-color:rgba(144,202,249,.5)}.bodjo-page div.question>span:nth-child(1){color:rgba(72,101,123,1)}.bodjo-page img.right{margin:10px 0 10px 10px;float:right;max-width:50%}.bodjo-page img.left{margin:10px 10px 10px 0;float:left;max-width:50%}.bodjo-page img{max-width:100%}.bodjo-page ul{margin:0 0 0 5px}.bodjo-page .signature{font-size:110%;margin-bottom:10px}.bodjo-page .signature .id{display:inline-block;text-decoration:none;border-bottom:1px dashed rgba(0,0,0,0.15);color:rgba(0,0,0,0.5);font-size:75%}.bodjo-page .signature .id:hover{border-bottom:1px dotted rgba(0,0,0,0.5)}.bodjo-page .signature .id:active{font-weight:bold;color:#000;border-bottom:1px solid #000;}.bodjo-page .signature .date{font-style:italic;font-size:60%}.bodjo-page .signature .info{float:right;text-align:right;margin:5px 0}.bodjo-page .signature .author{min-width:100px;display:inline-block;padding:5px 0}.bodjo-page .signature .author span.image{width:25px;height:25px;display:inline-block;background-size:contain;box-shadow:0 1px 3px rgba(0,0,0,.2);border-radius:50%;margin-right:8px}.bodjo-page .signature .author>*{vertical-align:bottom;display:inline-block;line-height:50%}.bodjo-page .signature .author .name .username{margin:0}.bodjo-page .signature .author .name .role{opacity:.5;font-size:60%;margin:0}.bodjo-page .signature .author.loading span.image{background-color:rgba(0,0,0,.1);animation:loadingblink infinite ease-in-out 1s}@keyframes loadingblink{0%{background:rgba(0,0,0,.025)}50%{background:rgba(0,0,0,.075)}100%{background:rgba(0,0,0,.025)}}';
 		document.querySelector('head').appendChild(stylesheet);
 	}
 
