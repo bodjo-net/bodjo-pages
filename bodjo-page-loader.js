@@ -153,7 +153,7 @@
 	}
 
 	function getServerIP(cb) {
-		GET('http://bodjo.net/SERVER_HOST', (status, data) => {
+		GET('https://bodjo.net/SERVER_HOST', (status, data) => {
 			if (status) {
 				SERVER_HOST = data;
 				cb();
