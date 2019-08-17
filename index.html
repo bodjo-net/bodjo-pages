@@ -8,7 +8,21 @@
 	<title>bodjo-pages</title>
 </head>
 <body>
-	<div id="main" class='bodjo-page' style="width: 80%; margin: 2% auto;"></div>
+	<div id="main" class='bodjo-page'></div>
+	<style type="text/css">
+		#main {
+			width: 80%;
+			box-sizing: border-box;
+			margin: 2% auto;
+		}
+		@media (max-width: 600px) {
+			#main {
+				width: 100%;
+				margin: 0;
+				padding: 2% 20px;
+			}
+		}
+	</style>
 	<script type="text/javascript" src='bodjo-page-loader.js'></script>
 	<script type="text/javascript">
 		let main = document.querySelector('#main');

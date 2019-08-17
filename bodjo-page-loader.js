@@ -54,7 +54,6 @@
 			setTimeout(function () {
 				GET(SERVER_HOST+'/account/info?username='+page.author, (status, data) => {
 					let author = document.querySelector('#'+id);
-					console.log(id)
 					if (author === null) return;
 					if (status && data.status == 'ok') {
 						let userInfo = data.result[0];
@@ -154,7 +153,7 @@
 	}
 
 	function getServerIP(cb) {
-		GET('https://bodjo.net/SERVER_HOST', (status, data) => {
+		GET('http://bodjo.net/SERVER_HOST', (status, data) => {
 			if (status) {
 				SERVER_HOST = data;
 				cb();
