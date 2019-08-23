@@ -8,6 +8,7 @@ body, html, head {
 	display: block;
 	margin: 10px auto;
 	width: 80%;
+	max-width: 900px;
 }
 #bar {
 	font-family: 'Source Code Pro', 'Roboto Mono', Consolas, monospace;
@@ -106,7 +107,8 @@ input {
 .btn {
 	display: inline-block;
 	padding: 8px 15px;
-	margin: 15px 0;
+	margin: 0;
+	margin-top: 15px;
 	background: #ffffff;
 	user-select: none;
 	border-radius: 2px;
@@ -130,8 +132,34 @@ input {
 #editor .btn#remove {
 	color: #ffffff;
 	background: #F44336;
-	margin-left: 10px;
 }
 #editor .btn#remove .ripple {
 	background: rgba(255,255,255,0.4);
+}
+#page-id-wrapper {
+	position: relative;
+}
+#page-id-suggestions {
+	width: 100%;
+
+	position: absolute;
+	z-index: 10;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+#page-id-suggestions div {
+	width: 100%;
+	padding: 10px;
+	box-sizing: border-box;
+	background: #FFFFFF;
+	cursor: pointer;
+	user-select: none;
+	-ms-user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}
+#page-id-suggestions div .ripple {
+	background: rgba(0,0,0,0.1);
+}
+#page-id-suggestions div span {
+	opacity: 0.5;
 }

@@ -81,6 +81,7 @@ function GET(url, callback) {
 	let xhr = new XMLHttpRequest();
 	if (url.indexOf('http://')!=0&&url.indexOf('https://')!=0)
 		url = 'http://'+url;
+	console.log('GET ' + url);
 	xhr.open('GET', url, true);
 	xhr.send();
 	xhr.onreadystatechange = function () {
@@ -95,13 +96,13 @@ function GET(url, callback) {
 		} else {
 			callback(false, xhr);
 		}
-
 	}
 }
 function POST(url, before, callback) {
 	let xhr = new XMLHttpRequest();
 	if (url.indexOf('http://')!=0&&url.indexOf('https://')!=0)
 		url = 'http://'+url;
+	console.log('POST ' + url);
 	xhr.open('POST', url, true);
 	before(xhr);
 	xhr.onreadystatechange = function () {
@@ -116,12 +117,12 @@ function POST(url, before, callback) {
 		} else {
 			callback(false, xhr);
 		}
-
 	}
 }
 
 let textarea = document.querySelector('#editor textarea');
 let idInput = document.querySelector("#editor #page-id");
+let idSuggestions = document.querySelector("#editor #page-id-suggestions");
 let preview = document.querySelector("#editor #preview");
 let count = document.querySelector("#count");
 let submit = document.querySelector("#editor #submit");
@@ -155,22 +156,60 @@ textarea.addEventListener('keydown', function(e) {
 
 let exists = false;
 idInput.addEventListener('change', onPageIDChange);
-idInput.addEventListener('keyup', () => window.location.hash = "#" + idInput.value)
+idInput.addEventListener('keyup', onInstantPageIDChange);
+function onInstantPageIDChange() {
+	console.log('hello')
+	let pageId = idInput.value;
+	setTimeout(() => {
+		if (pageId == idInput.value)
+			onPageIDChange();
+	}, 100);
+}
 function onPageIDChange() {
 	let pageId = idInput.value;
 	exists = false;
 	updateSubmitButton();
 	GET(SERVER_HOST + '/pages/load?id=' + pageId, (status, data) => {
 		if (status && data.status == 'ok') {
+			clearSuggestions();
 			if (data.page.id != pageId) {
 				exists = false;
 			} else {
 				textarea.value = data.page.content;
 				onChange();
 				exists = true;
+				location.hash = '#' + data.page.id;
 			}
 			updateSubmitButton();
+		} else if (status && data.status !== 'ok') {
+			// clearSuggestions();
+			if (pageId == idInput.value && pageId.length > 0) {
+				GET(SERVER_HOST + '/pages/search?count=4&q=' + pageId, (status, data) => {
+					if (status && data.status === 'ok') {
+						if (pageId == idInput.value) {
+							showSuggestions(data.pages);
+						}
+					}
+				})
+			}
 		}
+	});
+}
+function clearSuggestions() {
+	idSuggestions.innerHTML = '';
+}
+function showSuggestions(pages) {
+	clearSuggestions();
+	pages.forEach(page => {
+		let div = document.createElement('div');
+		div.innerHTML = page.id + ' <span>('+page.author+')</span>';
+		idSuggestions.appendChild(div);
+		obtainWithRipple(div);
+		div.addEventListener('click', () => {
+			clearSuggestions();
+			idInput.value = page.id;
+			onPageIDChange();
+		});
 	});
 }
 function updateSubmitButton() {
