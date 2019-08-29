@@ -24,21 +24,23 @@
 			}
 		}
 	</style>
+	<script type="text/javascript">
+		// window.onerror = alert;
+	</script>
 	<script type="text/javascript" src='/loader.min.js'></script>
 	<script type="text/javascript">
-		let main = document.querySelector('#main');
 		function load() {
-			main.innerHTML = '';
-
+			document.querySelector('#main').innerHTML = '';
 			let hash = window.location.hash;
 			if (hash[0] === '#')
 				hash = hash.substring(1);
 			if (hash === '')
 				hash = 'main.default.ru'
-			loadBodjoPage(hash, main);
+			loadBodjoPage(hash, '#main');
 		}
 		window.addEventListener('hashchange', load);
 		load();
+
 	</script>
 </body>
 </html>
