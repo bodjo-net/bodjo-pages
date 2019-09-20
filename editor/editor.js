@@ -33,39 +33,54 @@ function setCookie(name, value, options) {
   document.cookie = updatedCookie;
 }
 
-let tokenData = null;
+let token = JSON.parse(localStorage.getItem('bodjo-token')||getCookie('bodjo-token')||'null'),
+	verified = false;
 let auth = document.querySelector('#auth');
 let usernameInput = auth.querySelector("#username");
 let passwordInput = auth.querySelector("#password");
 usernameInput.addEventListener('change', credentialsChange);
 passwordInput.addEventListener('change', credentialsChange);
-function credentialsChange() {
+function credentialsChange(first) {
 	let usernameValue = usernameInput.value;
-	let passwordValue = /^\*+$/g.test(passwordInput.value) ? JSON.parse(localStorage['bodjo-password']) : passwordInput.value;
-	GET(SERVER_HOST + '/account/login?username=' + usernameValue + '&password=' + encodeURIComponent(passwordValue), (status, data) => {
-		if (usernameValue != usernameInput.value ||
-			(!/^\*+$/g.test(passwordInput.value) && passwordValue != passwordInput.value)) {
-			auth.className = '';
-			return;
-		}
-		if (status && data.status == 'ok') {
-			tokenData = data.token;
-			localStorage.setItem('bodjo-token', JSON.stringify(tokenData.value));
-			setCookie('bodjo-token', JSON.stringify(tokenData.value), {domain: 'bodjo.net'});
-			auth.className = 'verified';
-		} else {
-			auth.className = '';
-		}
+	let passwordValue = /^\*+$/g.test(passwordInput.value) ? null : passwordInput.value;
+	if (passwordValue == null && token) {
+		GET(SERVER_HOST + '/account/check?token=' + encodeURIComponent(token), (status, data) => {
+			if (status && data.status === 'ok') {
+				verified = true;
+				token = data.token.value;
+				localStorage.setItem('bodjo-token', JSON.stringify(token));
+				setCookie('bodjo-token', JSON.stringify(token), {domain: 'bodjo.net'});
+				auth.className = 'verified';
+			} else {
+				auth.className = '';
+			}
+		})
+	} else {
+		GET(SERVER_HOST + '/account/login?username=' + usernameValue + '&password=' + encodeURIComponent(passwordValue), (status, data) => {
+			if (usernameValue != usernameInput.value ||
+				(!/^\*+$/g.test(passwordInput.value) && passwordValue != passwordInput.value)) {
+				auth.className = '';
+				return;
+			}
+			if (status && data.status == 'ok') {
+				token = data.token.value;
+				auth.className = 'verified';
+			} else {
+				token = null;
+				auth.className = '';
+			}
 
-		localStorage.setItem('bodjo-username', JSON.stringify(usernameValue));
-		localStorage.setItem('bodjo-password', JSON.stringify(passwordValue));
-	})
+			localStorage.setItem('bodjo-token', JSON.stringify(token));
+			setCookie('bodjo-token', JSON.stringify(token), {domain: 'bodjo.net'});
+			localStorage.setItem('bodjo-username', JSON.stringify(usernameValue));
+		});
+	}
 }
 function onload() {
-	if (localStorage['bodjo-username'])
+	if (token && localStorage['bodjo-username']) {
 		usernameInput.value = JSON.parse(localStorage['bodjo-username']);
-	if (localStorage['bodjo-password'])
 		passwordInput.value = '*'.repeat(100);
+	}
 	credentialsChange();
 
 	if (location.hash) {
@@ -158,7 +173,6 @@ let exists = false;
 idInput.addEventListener('change', onPageIDChange);
 idInput.addEventListener('keyup', onInstantPageIDChange);
 function onInstantPageIDChange() {
-	console.log('hello')
 	let pageId = idInput.value;
 	setTimeout(() => {
 		if (pageId == idInput.value)
@@ -230,12 +244,12 @@ textarea.style.fontSize = fontSize + 'px';
 
 
 function upload() {
-	if (tokenData == null) {
+	if (token == null) {
 		alert('login first');
 		return;
 	}
 
-	POST(SERVER_HOST + "/pages/" + (exists ? 'edit' : 'publish') + "?id=" + idInput.value + "&token=" + tokenData.value, (req) => {
+	POST(SERVER_HOST + "/pages/" + (exists ? 'edit' : 'publish') + "?id=" + idInput.value + "&token=" + token, (req) => {
 		req.setRequestHeader('Content-Type', 'plain/text');
 		req.send(textarea.value);
 	}, (status, data) => {
@@ -258,12 +272,12 @@ submit.addEventListener('click', upload);
 
 function removePage() {
 
-	if (tokenData == null) {
+	if (token == null) {
 		alert('login first');
 		return;
 	}
 
-	GET(SERVER_HOST + "/pages/remove?id=" + idInput.value + "&token=" + tokenData.value,
+	GET(SERVER_HOST + "/pages/remove?id=" + idInput.value + "&token=" + token,
 		(status, data) => {
 		if (status && data.status == 'ok') {
 			alert('success');
