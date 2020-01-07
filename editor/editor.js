@@ -56,7 +56,7 @@ function credentialsChange(first) {
 			}
 		})
 	} else {
-		GET(SERVER_HOST + '/account/login?username=' + usernameValue + '&password=' + encodeURIComponent(passwordValue), (status, data) => {
+		GET(SERVER_HOST + '/account/_login?username=' + usernameValue + '&password=' + encodeURIComponent(passwordValue), (status, data) => {
 			if (usernameValue != usernameInput.value ||
 				(!/^\*+$/g.test(passwordInput.value) && passwordValue != passwordInput.value)) {
 				auth.className = '';
